@@ -21,17 +21,35 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userRepository.getByEmail(email);
+    }
+
+    @Override
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
     @Override
-    public User saveUser(User user) {
-        return null;
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 
     @Override
     public void addRoleToUser(String username, String roleName) {
+        User user = userRepository.getByUsername(username);
+        Role role = roleRepository.getByName(roleName);
+        user.getRoles().add(role);
+        userRepository.save(user);
+    }
 
+    @Override
+    public void deleteUserByUsername(String username) {
+        userRepository.deleteByUsername(username);
+    }
+
+    @Override
+    public void deleteUserByEmail(String email) {
+        userRepository.deleteByEmail(email);
     }
 }
