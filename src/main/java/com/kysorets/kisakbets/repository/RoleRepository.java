@@ -5,4 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface RoleRepository extends MongoRepository<Role, Integer> {
     Role getByName(String name);
+    void deleteByName(String name);
 }
