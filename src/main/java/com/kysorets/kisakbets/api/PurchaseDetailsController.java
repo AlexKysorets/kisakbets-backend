@@ -39,7 +39,7 @@ public class PurchaseDetailsController {
     }
 
     // DELETE
-    @DeleteMapping("/purchase-detail}")
+    @DeleteMapping("/purchase-detail")
     public void deletePurchaseDetails(@RequestBody Subscription subscription) {
         purchaseDetailsService.deletePurchaseDetails(subscription);
     }
