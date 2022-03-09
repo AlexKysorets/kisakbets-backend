@@ -20,20 +20,20 @@ public class Token {
         return jwtVerifier.verify(token);
     }
 
-    public String giveAccessToken(String nickname, HttpServletRequest request, Collection<Role> roles,
+    public String giveAccessToken(String username, HttpServletRequest request, Collection<Role> roles,
                                   Collection<GrantedAuthority> grantedAuthorities) {
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
 
         if (!roles.isEmpty()) {
             return JWT.create()
-                    .withSubject(nickname)
+                    .withSubject(username)
                     .withExpiresAt(new Date(System.currentTimeMillis() + 6 * 60 * 60 * 1000)) // 6 hours
                     .withIssuer(request.getRequestURL().toString())
                     .withClaim("roles", roles.stream().map(Role::getName).collect(Collectors.toList()))
                     .sign(algorithm);
         } else {
             return JWT.create()
-                    .withSubject(nickname)
+                    .withSubject(username)
                     .withExpiresAt(new Date(System.currentTimeMillis() + 6 * 60 * 60 * 1000)) // 6 hours
                     .withIssuer(request.getRequestURL().toString())
                     .withClaim("roles", grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
@@ -41,10 +41,10 @@ public class Token {
         }
     }
 
-    public String giveRefreshToken(String nickname, HttpServletRequest request) {
+    public String giveRefreshToken(String username, HttpServletRequest request) {
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
         return JWT.create()
-                .withSubject(nickname)
+                .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + 14 * 24 * 60 * 60 * 1000)) // 2 weeks
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
