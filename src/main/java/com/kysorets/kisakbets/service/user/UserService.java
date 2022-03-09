@@ -8,7 +8,10 @@ import java.util.List;
 @Service
 public interface UserService {
     User getUserByUsername(String username);
+    User getUserByEmail(String email);
     List<User> getUsers();
-    User saveUser(User user);
+    void saveUser(User user);
     void addRoleToUser(String username, String roleName);
+    void deleteUserByUsername(String username);
+    void deleteUserByEmail(String email);
 }
