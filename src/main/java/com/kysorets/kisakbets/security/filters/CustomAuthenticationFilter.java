@@ -3,6 +3,7 @@ package com.kysorets.kisakbets.security.filters;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.security.token.Token;
+import com.kysorets.kisakbets.service.user.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -60,11 +62,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 //        response.setHeader("refresh_token", refresh_token);
 
         // get tokens in json response
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", access_token);
-        tokens.put("refresh_token", refresh_token);
+        com.kysorets.kisakbets.model.User userInfo = userService.getUserByUsername(user.getUsername());
+        Map<String, String> result = new HashMap<>();
+        result.put("username", userInfo.getUsername());
+        result.put("password", userInfo.getPassword());
+        result.put("email", userInfo.getEmail());
+        result.put("access_token", access_token);
+        result.put("refresh_token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        new ObjectMapper().writeValue(response.getOutputStream(), result);
     }
 
     public UserInfo convertJsonToObject(HttpServletRequest request) throws IOException {
