@@ -73,6 +73,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         new ObjectMapper().writeValue(response.getOutputStream(), result);
     }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Bad credentials!");
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), errors);
+    }
+
     public UserInfo convertJsonToObject(HttpServletRequest request) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
