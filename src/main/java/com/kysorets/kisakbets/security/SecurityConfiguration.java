@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -36,7 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         // PATHS FOR EVERYBODY
-        http.authorizeRequests().antMatchers( "/login", "/token/refresh").permitAll();
+        http.authorizeRequests().antMatchers( "/login", "/token/refresh", "/signup").permitAll();
         // PATHS FOR ADMINS
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/**")
                 .hasAnyAuthority("ROLE_ADMIN");
