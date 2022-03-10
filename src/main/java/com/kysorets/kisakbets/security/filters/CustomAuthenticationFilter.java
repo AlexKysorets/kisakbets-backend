@@ -79,6 +79,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "Bad credentials!");
         response.setContentType(APPLICATION_JSON_VALUE);
+        response.setStatus(401);
         new ObjectMapper().writeValue(response.getOutputStream(), errors);
     }
 
