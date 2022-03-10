@@ -33,17 +33,27 @@ public class SignUpController {
             if (user1 == null) {
                 // successful registration
             } else {
-                error.put("error", "User with such email already exists!");
-                response.setContentType(APPLICATION_JSON_VALUE);
-                response.setStatus(401);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
+                unsuccessfulRegistration(response, "Email");
             }
         } else {
-            error.put("error", "User with such username already exists!");
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setStatus(401);
-            new ObjectMapper().writeValue(response.getOutputStream(), error);
+            unsuccessfulRegistration(response, "Username");
         }
+    }
+
+    public void successfulRegistration(HttpServletResponse response) {
+
+    }
+
+    public void unsuccessfulRegistration(HttpServletResponse response, String type) throws IOException {
+        Map<String, String> errors = new HashMap<>();
+        if (type.equals("Email")) {
+            errors.put("error", "User with such email already exists!");
+        } else {
+            errors.put("error", "User with such username already exists!");
+        }
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setStatus(401);
+        new ObjectMapper().writeValue(response.getOutputStream(), errors);
     }
 }
 
