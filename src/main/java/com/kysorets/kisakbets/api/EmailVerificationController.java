@@ -1,5 +1,8 @@
 package com.kysorets.kisakbets.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kysorets.kisakbets.model.User;
+import com.kysorets.kisakbets.service.user.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
@@ -13,18 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("")
+@RequestMapping("/email")
 public class EmailVerificationController {
     private final HttpServletResponse response;
     private final JavaMailSender javaMailSender;
+    private final UserService userService;
 
-    @PostMapping("/email-verification")
-    public void sendEmailVerificationLetter(@RequestBody UserEmailInfo userEmailInfo) {
+    @PostMapping("/send")
+    public void sendEmailVerificationLetter(@RequestBody UserEmailInfo userEmailInfo) throws IOException {
         String code = RandomString.make(6);
         String toAddress = userEmailInfo.getEmail();
         String fromAddress = "alexproba140920@gmail.com";
@@ -46,6 +55,24 @@ public class EmailVerificationController {
             e.printStackTrace();
         }
         javaMailSender.send(message);
+        Map<String, String> info = new HashMap<>();
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), info);
+    }
+
+    @PostMapping("/verify")
+    public void checkVerificationCode(@RequestBody UserCodeInfo userCodeInfo) throws IOException {
+        if (userCodeInfo.getRealCode().equals(userCodeInfo.getUserCode())) {
+            User user = userService.getUserByUsername(userCodeInfo.getUsername());
+            user.setVerified(true);
+            userService.saveUser(user);
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "Wrong verification code!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            response.setStatus(401);
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
     }
 }
 
@@ -53,4 +80,11 @@ public class EmailVerificationController {
 class UserEmailInfo {
     private String username;
     private String email;
+}
+
+@Data
+class UserCodeInfo {
+    private String username;
+    private String userCode;
+    private String realCode;
 }
