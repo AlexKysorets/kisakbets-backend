@@ -63,12 +63,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         // get tokens in json response
         com.kysorets.kisakbets.model.User userInfo = userService.getUserByUsername(user.getUsername());
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("username", userInfo.getUsername());
         result.put("password", userInfo.getPassword());
         result.put("email", userInfo.getEmail());
         result.put("access_token", access_token);
         result.put("refresh_token", refresh_token);
+        result.put("isVerified", userInfo.isVerified());
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), result);
     }
@@ -79,6 +80,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "Bad credentials!");
         response.setContentType(APPLICATION_JSON_VALUE);
+        response.setStatus(401);
         new ObjectMapper().writeValue(response.getOutputStream(), errors);
     }
 
