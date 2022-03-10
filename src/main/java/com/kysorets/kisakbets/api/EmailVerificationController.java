@@ -56,6 +56,7 @@ public class EmailVerificationController {
         }
         javaMailSender.send(message);
         Map<String, String> info = new HashMap<>();
+        info.put("code", code);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), info);
     }
