@@ -2,7 +2,9 @@ package com.kysorets.kisakbets.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.model.User;
+import com.kysorets.kisakbets.model.VerificationCode;
 import com.kysorets.kisakbets.service.user.UserService;
+import com.kysorets.kisakbets.service.verificationcode.VerificationCodeService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
@@ -18,6 +20,8 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -31,15 +35,24 @@ public class EmailVerificationController {
     private final HttpServletResponse response;
     private final JavaMailSender javaMailSender;
     private final UserService userService;
+    private final VerificationCodeService verificationCodeService;
 
     @PostMapping("/send")
     public void sendEmailVerificationLetter(@RequestBody UserEmailInfo userEmailInfo) throws IOException {
-        String code = RandomString.make(6);
+        String random = RandomString.make(50);
+        LocalDateTime date = LocalDateTime.now().plusHours(24);
+        User user = userService.getUserByUsername(userEmailInfo.getUsername());
+        VerificationCode verificationCode = new VerificationCode(random, date, user);
+
+        verificationCodeService.saveVerificationCode(verificationCode);
+        userService.saveUser(user);
+
         String toAddress = userEmailInfo.getEmail();
         String fromAddress = "alexproba140920@gmail.com";
         String senderName = "Kisak Inc";
         String subject = "KisakBets email verification";
-        String content = "Verification code ---> " + code;
+        String content = "To verify your email click this link ---> " + "http://localhost:8080/email/verify?code=" +
+                verificationCode.getCode();
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
@@ -55,10 +68,6 @@ public class EmailVerificationController {
             e.printStackTrace();
         }
         javaMailSender.send(message);
-        Map<String, String> info = new HashMap<>();
-        info.put("code", code);
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), info);
     }
 
     @PostMapping("/verify")
