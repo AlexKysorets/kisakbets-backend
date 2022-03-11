@@ -8,6 +8,7 @@ import com.kysorets.kisakbets.service.role.RoleService;
 import com.kysorets.kisakbets.service.user.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ public class SignUpController {
     private final RoleService roleService;
     private final HttpServletResponse response;
     private final HttpServletRequest request;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
     public void tryToSignUp(@RequestBody UserInfo userInfo) throws IOException {
@@ -49,7 +51,7 @@ public class SignUpController {
 
     public void successfulRegistration(HttpServletRequest request, HttpServletResponse response, UserInfo userInfo) throws IOException {
         Role role = roleService.getRoleByName("ROLE_USER");
-        User user = new User(userInfo.getUsername(), userInfo.getPassword(), userInfo.getEmail(), false,
+        User user = new User(userInfo.getUsername(), passwordEncoder.encode(userInfo.getPassword()), userInfo.getEmail(), false,
                 new ArrayList<>(List.of(role)), "");
         userService.saveUser(user);
 
