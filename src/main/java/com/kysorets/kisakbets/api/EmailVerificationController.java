@@ -62,18 +62,7 @@ public class EmailVerificationController {
     }
 
     @PostMapping("/verify")
-    public void checkVerificationCode(@RequestBody UserCodeInfo userCodeInfo) throws IOException {
-        if (userCodeInfo.getRealCode().equals(userCodeInfo.getUserCode())) {
-            User user = userService.getUserByUsername(userCodeInfo.getUsername());
-            user.setVerified(true);
-            userService.saveUser(user);
-        } else {
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", "Wrong verification code!");
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setStatus(401);
-            new ObjectMapper().writeValue(response.getOutputStream(), errors);
-        }
+    public void checkVerificationCode() {
     }
 }
 
@@ -81,11 +70,4 @@ public class EmailVerificationController {
 class UserEmailInfo {
     private String username;
     private String email;
-}
-
-@Data
-class UserCodeInfo {
-    private String username;
-    private String userCode;
-    private String realCode;
 }
