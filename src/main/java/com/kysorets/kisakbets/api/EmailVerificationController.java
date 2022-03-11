@@ -43,6 +43,7 @@ public class EmailVerificationController {
         LocalDateTime date = LocalDateTime.now().plusHours(24);
         User user = userService.getUserByUsername(userEmailInfo.getUsername());
         VerificationCode verificationCode = new VerificationCode(random, date, user);
+        user.setCode(random);
 
         verificationCodeService.saveVerificationCode(verificationCode);
         userService.saveUser(user);

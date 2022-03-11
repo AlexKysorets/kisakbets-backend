@@ -50,7 +50,7 @@ public class SignUpController {
     public void successfulRegistration(HttpServletRequest request, HttpServletResponse response, UserInfo userInfo) throws IOException {
         Role role = roleService.getRoleByName("ROLE_USER");
         User user = new User(userInfo.getUsername(), userInfo.getPassword(), userInfo.getEmail(), false,
-                new ArrayList<>(List.of(role)));
+                new ArrayList<>(List.of(role)), "");
         userService.saveUser(user);
 
         String access_token = new Token().giveAccessToken(user.getUsername(), request, user.getRoles(), null);

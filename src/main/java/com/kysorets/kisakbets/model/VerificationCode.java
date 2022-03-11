@@ -15,6 +15,5 @@ import java.time.LocalDateTime;
 public class VerificationCode {
     private String code;
     private LocalDateTime expiresAt;
-    @DocumentReference
     private User user;
 }
