@@ -11,10 +11,7 @@ import net.bytebuddy.utility.RandomString;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -84,12 +81,25 @@ public class EmailVerificationController {
             errors.put("error", "Failed to send email message!");
             new ObjectMapper().writeValue(response.getOutputStream(), errors);
         }
-
-//        javaMailSender.send(message);
     }
 
-    @PostMapping("/verify")
-    public void checkVerificationCode() {
+    @GetMapping("/verify")
+    public void checkVerificationCode(@RequestParam("code") String code) throws IOException {
+        VerificationCode verificationCode = verificationCodeService.getVerificationCodeByCode(code);
+        LocalDateTime date = LocalDateTime.now().minusHours(24);
+        if (verificationCode.getExpiresAt().isAfter(date)) {
+            User user = verificationCode.getUser();
+            user.setVerified(true);
+            user.setCode("");
+            userService.saveUser(user);
+            verificationCodeService.deleteVerificationCodeByCode(code);
+            Map<String, String> result = new HashMap<>();
+            result.put("message", "Successful verifying email!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), result);
+        } else {
+            //unsuccess
+        }
     }
 }
 
