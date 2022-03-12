@@ -21,7 +21,6 @@ import java.util.List;
 public class UserServiceImplementation implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User getUserByUsername(String username) {
@@ -40,7 +39,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     @Override
     public void saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
