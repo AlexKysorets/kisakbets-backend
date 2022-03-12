@@ -8,6 +8,7 @@ import com.kysorets.kisakbets.service.verificationcode.VerificationCodeService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +69,23 @@ public class EmailVerificationController {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        javaMailSender.send(message);
+
+        try {
+            javaMailSender.send(message);
+            response.setContentType(APPLICATION_JSON_VALUE);
+            Map<String, String> result = new HashMap<>();
+            result.put("message", "Email letter was sent successful!");
+            new ObjectMapper().writeValue(response.getOutputStream(), result);
+        } catch (MailSendException e) {
+            e.printStackTrace();
+            response.setContentType(APPLICATION_JSON_VALUE);
+            response.setStatus(502);
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "Failed to send email message!");
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
+
+//        javaMailSender.send(message);
     }
 
     @PostMapping("/verify")
