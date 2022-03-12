@@ -98,7 +98,11 @@ public class EmailVerificationController {
             response.setContentType(APPLICATION_JSON_VALUE);
             new ObjectMapper().writeValue(response.getOutputStream(), result);
         } else {
-            //unsuccess
+            Map<String, String> errors = new HashMap<>();
+            response.setContentType(APPLICATION_JSON_VALUE);
+            response.setStatus(401);
+            errors.put("error", "Verification code has expired!");
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
         }
     }
 }
