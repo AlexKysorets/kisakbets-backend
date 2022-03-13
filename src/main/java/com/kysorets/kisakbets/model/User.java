@@ -25,13 +25,15 @@ public class User {
     @DocumentReference
     private Collection<Role> roles = new ArrayList<>();
     private String code;
+    private String passwordCode;
 
-    public User(String username, String password, String email, boolean isVerified, Collection<Role> roles, String code) {
+    public User(String username, String password, String email, boolean isVerified, Collection<Role> roles, String code, String passwordCode) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.isVerified = isVerified;
         this.roles = roles;
         this.code = code;
+        this.passwordCode = passwordCode;
     }
 }
