@@ -40,23 +40,31 @@ public class ForgotPasswordController {
     public void forgotPassword(@RequestBody ForgotPassInfo info) throws IOException {
         User user = userService.getUserByEmail(info.getEmail());
         if (user != null) {
-            String random = RandomString.make(50);
-            LocalDateTime date = LocalDateTime.now().plusHours(24);
-            PasswordCode passwordCode = new PasswordCode(random, date, user);
-            user.setPasswordCode(random);
+            if (user.isVerified()) {
+                String random = RandomString.make(50);
+                LocalDateTime date = LocalDateTime.now().plusHours(24);
+                PasswordCode passwordCode = new PasswordCode(random, date, user);
+                user.setPasswordCode(random);
 
-            // delete previous code
-            PasswordCode previous = passwordCodeService.getPasswordCodeByUser(user);
-            if (previous != null) {
-                passwordCodeService.deletePasswordCodeByCode(previous.getCode());
+                // delete previous code
+                PasswordCode previous = passwordCodeService.getPasswordCodeByUser(user);
+                if (previous != null) {
+                    passwordCodeService.deletePasswordCodeByCode(previous.getCode());
+                }
+
+                passwordCodeService.savePasswordCode(passwordCode);
+                userService.saveUser(user);
+
+                emailSender.sendEmail(info.getEmail(), "KisakBets forgot password", "To reset your password "+
+                                "click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" + passwordCode.getCode(),
+                        response);
+            } else {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("error", "User doesn't verify his email!");
+                response.setContentType(APPLICATION_JSON_VALUE);
+                response.setStatus(401);
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
             }
-
-            passwordCodeService.savePasswordCode(passwordCode);
-            userService.saveUser(user);
-
-            emailSender.sendEmail(info.getEmail(), "KisakBets forgot password", "To reset your password "+
-                    "click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" + passwordCode.getCode(),
-                    response);
         } else {
             Map<String, String> errors = new HashMap<>();
             errors.put("error", "User with such email doesn't exist!");
