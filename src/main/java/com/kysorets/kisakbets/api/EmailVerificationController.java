@@ -92,42 +92,9 @@ public class EmailVerificationController {
             verificationCodeService.saveVerificationCode(newVerificationCode);
             userService.saveUser(user);
 
-//            String toAddress = user.getEmail();
-//            String fromAddress = "alexproba140920@gmail.com";
-//            String senderName = "Kisak Inc";
-//            String subject = "KisakBets email verification";
-//            String content = "To verify your email click this link ---> " + "http://localhost:8080/email/verify?code=" +
-//                    newVerificationCode.getCode();
-//
-//            MimeMessage message = javaMailSender.createMimeMessage();
-//            MimeMessageHelper messageHelper = new MimeMessageHelper(message);
-//
-//            try {
-//                messageHelper.setFrom(fromAddress, senderName);
-//                messageHelper.setTo(toAddress);
-//                messageHelper.setSubject(subject);
-//                messageHelper.setText(content, true);
-//            } catch (MessagingException e) {
-//                e.printStackTrace();
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-//
-//            try {
-//                javaMailSender.send(message);
-//                response.setContentType(APPLICATION_JSON_VALUE);
-//                Map<String, String> result = new HashMap<>();
-//                result.put("message", "Email letter was sent successful!");
-//                new ObjectMapper().writeValue(response.getOutputStream(), result);
-//            } catch (MailSendException e) {
-//                e.printStackTrace();
-//                response.setContentType(APPLICATION_JSON_VALUE);
-//                response.setStatus(502);
-//                Map<String, String> errors = new HashMap<>();
-//                errors.put("error", "Failed to send email message!");
-//                new ObjectMapper().writeValue(response.getOutputStream(), errors);
-//            }
-
+            emailSender.sendEmail(user.getEmail(), "KisakBets email verification", "To verify your email " +
+                    "click this link ---> " + "http://localhost:8080/email/verify?code=" + newVerificationCode.getCode(),
+                    response);
             // redirect to frontend with message that email verification letter was sent again
         }
     }
