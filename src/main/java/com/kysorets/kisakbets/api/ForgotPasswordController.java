@@ -33,7 +33,6 @@ public class ForgotPasswordController {
     private final UserService userService;
     private final HttpServletResponse response;
     private final PasswordCodeService passwordCodeService;
-//    private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
 
