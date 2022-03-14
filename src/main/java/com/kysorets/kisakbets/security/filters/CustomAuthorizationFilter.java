@@ -1,6 +1,7 @@
 package com.kysorets.kisakbets.security.filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.security.token.Token;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,10 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
@@ -43,8 +47,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
-                    response.setHeader("error", e.getMessage());
-                    response.sendError(FORBIDDEN.value());
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    Map<String, String> errors = new HashMap<>();
+                    errors.put("error", e.getMessage());
+                    new ObjectMapper().writeValue(response.getOutputStream(), errors);
                 }
             } else {
                 filterChain.doFilter(request, response);
