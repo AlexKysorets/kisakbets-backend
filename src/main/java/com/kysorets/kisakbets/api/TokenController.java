@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -46,11 +45,16 @@ public class TokenController {
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
             } catch (Exception e) {
-                response.setHeader("error", e.getMessage());
-                response.sendError(FORBIDDEN.value());
+                Map<String, String> errors = new HashMap<>();
+                errors.put("error", e.getMessage());
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
             }
         } else {
-            throw new RuntimeException("Refresh token is missing");
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "Refresh token is missing!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
         }
     }
 }
