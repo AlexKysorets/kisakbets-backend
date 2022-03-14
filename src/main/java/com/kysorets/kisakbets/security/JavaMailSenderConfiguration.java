@@ -2,7 +2,6 @@ package com.kysorets.kisakbets.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
@@ -21,5 +20,10 @@ public class JavaMailSenderConfiguration {
         mailProperties.put("mail.smtp.starttls.enable", true);
         javaMailSender.setJavaMailProperties(mailProperties);
         return javaMailSender;
+    }
+
+    @Bean
+    EmailSender emailSender() {
+        return new EmailSender(javaMailSender());
     }
 }
