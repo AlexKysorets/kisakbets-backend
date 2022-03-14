@@ -3,28 +3,19 @@ package com.kysorets.kisakbets.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.model.User;
 import com.kysorets.kisakbets.model.VerificationCode;
+import com.kysorets.kisakbets.security.EmailSender;
 import com.kysorets.kisakbets.service.user.UserService;
 import com.kysorets.kisakbets.service.verificationcode.VerificationCodeService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.mail.MailSendException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -33,9 +24,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/email")
 public class EmailVerificationController {
     private final HttpServletResponse response;
-    private final JavaMailSender javaMailSender;
     private final UserService userService;
     private final VerificationCodeService verificationCodeService;
+    private final EmailSender emailSender;
 
     @PostMapping("/send")
     public void sendEmailVerificationLetter(@RequestBody UserEmailInfo userEmailInfo) throws IOException {
@@ -54,41 +45,9 @@ public class EmailVerificationController {
         verificationCodeService.saveVerificationCode(verificationCode);
         userService.saveUser(user);
 
-        String toAddress = userEmailInfo.getEmail();
-        String fromAddress = "alexproba140920@gmail.com";
-        String senderName = "Kisak Inc";
-        String subject = "KisakBets email verification";
-        String content = "To verify your email click this link ---> " + "http://localhost:8080/email/verify?code=" +
-                verificationCode.getCode();
-
-        MimeMessage message = javaMailSender.createMimeMessage();
-        MimeMessageHelper messageHelper = new MimeMessageHelper(message);
-
-        try {
-            messageHelper.setFrom(fromAddress, senderName);
-            messageHelper.setTo(toAddress);
-            messageHelper.setSubject(subject);
-            messageHelper.setText(content, true);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            javaMailSender.send(message);
-            response.setContentType(APPLICATION_JSON_VALUE);
-            Map<String, String> result = new HashMap<>();
-            result.put("message", "Email letter was sent successful!");
-            new ObjectMapper().writeValue(response.getOutputStream(), result);
-        } catch (MailSendException e) {
-            e.printStackTrace();
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setStatus(502);
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", "Failed to send email message!");
-            new ObjectMapper().writeValue(response.getOutputStream(), errors);
-        }
+        emailSender.sendEmail(userEmailInfo.getEmail(), "KisakBets email verification", "To verify your " +
+                "email click this link ---> " + "http://localhost:8080/email/verify?code=" + verificationCode.getCode(),
+                response);
     }
 
     @GetMapping("/verify")
@@ -122,42 +81,9 @@ public class EmailVerificationController {
             verificationCodeService.saveVerificationCode(newVerificationCode);
             userService.saveUser(user);
 
-            String toAddress = user.getEmail();
-            String fromAddress = "alexproba140920@gmail.com";
-            String senderName = "Kisak Inc";
-            String subject = "KisakBets email verification";
-            String content = "To verify your email click this link ---> " + "http://localhost:8080/email/verify?code=" +
-                    newVerificationCode.getCode();
-
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message);
-
-            try {
-                messageHelper.setFrom(fromAddress, senderName);
-                messageHelper.setTo(toAddress);
-                messageHelper.setSubject(subject);
-                messageHelper.setText(content, true);
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                javaMailSender.send(message);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                Map<String, String> result = new HashMap<>();
-                result.put("message", "Email letter was sent successful!");
-                new ObjectMapper().writeValue(response.getOutputStream(), result);
-            } catch (MailSendException e) {
-                e.printStackTrace();
-                response.setContentType(APPLICATION_JSON_VALUE);
-                response.setStatus(502);
-                Map<String, String> errors = new HashMap<>();
-                errors.put("error", "Failed to send email message!");
-                new ObjectMapper().writeValue(response.getOutputStream(), errors);
-            }
-
+            emailSender.sendEmail(user.getEmail(), "KisakBets email verification", "To verify your email " +
+                    "click this link ---> " + "http://localhost:8080/email/verify?code=" + newVerificationCode.getCode(),
+                    response);
             // redirect to frontend with message that email verification letter was sent again
         }
     }
