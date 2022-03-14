@@ -43,6 +43,12 @@ public class EmailVerificationController {
         VerificationCode verificationCode = new VerificationCode(random, date, user);
         user.setCode(random);
 
+        // delete previous code
+        VerificationCode previous = verificationCodeService.getVerificationCodeByUser(user);
+        if (previous != null) {
+            verificationCodeService.deleteVerificationCodeByCode(previous.getCode());
+        }
+
         verificationCodeService.saveVerificationCode(verificationCode);
         userService.saveUser(user);
 
