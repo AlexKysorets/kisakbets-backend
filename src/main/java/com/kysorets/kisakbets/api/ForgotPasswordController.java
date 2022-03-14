@@ -109,11 +109,58 @@ public class ForgotPasswordController {
             response.setContentType(APPLICATION_JSON_VALUE);
             new ObjectMapper().writeValue(response.getOutputStream(), result);
         } else {
-            Map<String, String> errors = new HashMap<>();
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setStatus(401);
-            errors.put("error", "Password code has expired!");
-            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+            String random = RandomString.make(50);
+            LocalDateTime dateTime = LocalDateTime.now().plusHours(24);
+            User user = passwordCode.getUser();
+            PasswordCode newPasswordCode = new PasswordCode(random, dateTime, user);
+            user.setPasswordCode(random);
+
+            // delete previous code
+            PasswordCode previous = passwordCodeService.getPasswordCodeByUser(user);
+            if (previous != null) {
+                passwordCodeService.deletePasswordCodeByCode(previous.getCode());
+            }
+
+            passwordCodeService.savePasswordCode(newPasswordCode);
+            userService.saveUser(user);
+
+            String toAddress = user.getEmail();
+            String fromAddress = "alexproba140920@gmail.com";
+            String senderName = "Kisak Inc";
+            String subject = "KisakBets forgot password";
+            String content = "To reset your password click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" +
+                    newPasswordCode.getCode();
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message);
+
+            try {
+                messageHelper.setFrom(fromAddress, senderName);
+                messageHelper.setTo(toAddress);
+                messageHelper.setSubject(subject);
+                messageHelper.setText(content, true);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                javaMailSender.send(message);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                Map<String, String> result = new HashMap<>();
+                result.put("message", "Email letter was sent successful!");
+                new ObjectMapper().writeValue(response.getOutputStream(), result);
+            } catch (MailSendException e) {
+                e.printStackTrace();
+                response.setContentType(APPLICATION_JSON_VALUE);
+                response.setStatus(502);
+                Map<String, String> errors = new HashMap<>();
+                errors.put("error", "Failed to send email message!");
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
+            }
+
+            // redirect to frontend with message that email password changing letter was sent again
         }
     }
 
