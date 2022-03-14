@@ -3,6 +3,7 @@ package com.kysorets.kisakbets.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.model.PasswordCode;
 import com.kysorets.kisakbets.model.User;
+import com.kysorets.kisakbets.security.EmailSender;
 import com.kysorets.kisakbets.service.passwordcode.PasswordCodeService;
 import com.kysorets.kisakbets.service.user.UserService;
 import lombok.Data;
@@ -32,8 +33,9 @@ public class ForgotPasswordController {
     private final UserService userService;
     private final HttpServletResponse response;
     private final PasswordCodeService passwordCodeService;
-    private final JavaMailSender javaMailSender;
+//    private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final EmailSender emailSender;
 
     @PostMapping("/send")
     public void forgotPassword(@RequestBody ForgotPassInfo info) throws IOException {
@@ -53,41 +55,9 @@ public class ForgotPasswordController {
             passwordCodeService.savePasswordCode(passwordCode);
             userService.saveUser(user);
 
-            String toAddress = info.getEmail();
-            String fromAddress = "alexproba140920@gmail.com";
-            String senderName = "Kisak Inc";
-            String subject = "KisakBets forgot password";
-            String content = "To reset your password click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" +
-                    passwordCode.getCode();
-
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message);
-
-            try {
-                messageHelper.setFrom(fromAddress, senderName);
-                messageHelper.setTo(toAddress);
-                messageHelper.setSubject(subject);
-                messageHelper.setText(content, true);
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                javaMailSender.send(message);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                Map<String, String> result = new HashMap<>();
-                result.put("message", "Email letter was sent successful!");
-                new ObjectMapper().writeValue(response.getOutputStream(), result);
-            } catch (MailSendException e) {
-                e.printStackTrace();
-                response.setContentType(APPLICATION_JSON_VALUE);
-                response.setStatus(502);
-                Map<String, String> errors = new HashMap<>();
-                errors.put("error", "Failed to send email message!");
-                new ObjectMapper().writeValue(response.getOutputStream(), errors);
-            }
+            emailSender.sendEmail(info.getEmail(), "KisakBets forgot password", "To reset your password "+
+                    "click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" + passwordCode.getCode(),
+                    response);
         } else {
             Map<String, String> errors = new HashMap<>();
             errors.put("error", "User with such email doesn't exist!");
@@ -124,41 +94,9 @@ public class ForgotPasswordController {
             passwordCodeService.savePasswordCode(newPasswordCode);
             userService.saveUser(user);
 
-            String toAddress = user.getEmail();
-            String fromAddress = "alexproba140920@gmail.com";
-            String senderName = "Kisak Inc";
-            String subject = "KisakBets forgot password";
-            String content = "To reset your password click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" +
-                    newPasswordCode.getCode();
-
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message);
-
-            try {
-                messageHelper.setFrom(fromAddress, senderName);
-                messageHelper.setTo(toAddress);
-                messageHelper.setSubject(subject);
-                messageHelper.setText(content, true);
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                javaMailSender.send(message);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                Map<String, String> result = new HashMap<>();
-                result.put("message", "Email letter was sent successful!");
-                new ObjectMapper().writeValue(response.getOutputStream(), result);
-            } catch (MailSendException e) {
-                e.printStackTrace();
-                response.setContentType(APPLICATION_JSON_VALUE);
-                response.setStatus(502);
-                Map<String, String> errors = new HashMap<>();
-                errors.put("error", "Failed to send email message!");
-                new ObjectMapper().writeValue(response.getOutputStream(), errors);
-            }
+            emailSender.sendEmail(user.getEmail(), "KisakBets forgot password", "To reset your password " +
+                    "click this link ---> " + "http://localhost:8080/forgot-pass/verify?code=" + newPasswordCode.getCode(),
+                    response);
 
             // redirect to frontend with message that email password changing letter was sent again
         }
