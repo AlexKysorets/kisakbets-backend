@@ -36,8 +36,16 @@ public class ForgotUsernameController {
     public void forgotUsername(@RequestBody ForgotUsernameInfo info) throws IOException {
         User user = userService.getUserByEmail(info.getEmail());
         if (user != null) {
-            emailSender.sendEmail(info.getEmail(), "KisakBets forgot username", "Your username ---> " +
-                    user.getUsername(), response);
+            if (user.isVerified()) {
+                emailSender.sendEmail(info.getEmail(), "KisakBets forgot username", "Your username ---> " +
+                        user.getUsername(), response);
+            } else {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("error", "User doesn't verify his email!");
+                response.setContentType(APPLICATION_JSON_VALUE);
+                response.setStatus(401);
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
+            }
         } else {
             Map<String, String> errors = new HashMap<>();
             errors.put("error", "User with such email doesn't exist!");
