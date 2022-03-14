@@ -44,6 +44,12 @@ public class ForgotPasswordController {
             PasswordCode passwordCode = new PasswordCode(random, date, user);
             user.setPasswordCode(random);
 
+            // delete previous code
+            PasswordCode previous = passwordCodeService.getPasswordCodeByUser(user);
+            if (previous != null) {
+                passwordCodeService.deletePasswordCodeByCode(previous.getCode());
+            }
+
             passwordCodeService.savePasswordCode(passwordCode);
             userService.saveUser(user);
 
