@@ -18,6 +18,8 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -104,11 +106,59 @@ public class EmailVerificationController {
             response.setContentType(APPLICATION_JSON_VALUE);
             new ObjectMapper().writeValue(response.getOutputStream(), result);
         } else {
-            Map<String, String> errors = new HashMap<>();
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setStatus(401);
-            errors.put("error", "Verification code has expired!");
-            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+            // here
+            String random = RandomString.make(50);
+            LocalDateTime dateTime = LocalDateTime.now().plusHours(24);
+            User user = verificationCode.getUser();
+            VerificationCode newVerificationCode = new VerificationCode(random, dateTime, user);
+            user.setCode(random);
+
+            // delete previous code
+            VerificationCode previous = verificationCodeService.getVerificationCodeByUser(user);
+            if (previous != null) {
+                verificationCodeService.deleteVerificationCodeByCode(previous.getCode());
+            }
+
+            verificationCodeService.saveVerificationCode(newVerificationCode);
+            userService.saveUser(user);
+
+            String toAddress = user.getEmail();
+            String fromAddress = "alexproba140920@gmail.com";
+            String senderName = "Kisak Inc";
+            String subject = "KisakBets email verification";
+            String content = "To verify your email click this link ---> " + "http://localhost:8080/email/verify?code=" +
+                    newVerificationCode.getCode();
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message);
+
+            try {
+                messageHelper.setFrom(fromAddress, senderName);
+                messageHelper.setTo(toAddress);
+                messageHelper.setSubject(subject);
+                messageHelper.setText(content, true);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                javaMailSender.send(message);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                Map<String, String> result = new HashMap<>();
+                result.put("message", "Email letter was sent successful!");
+                new ObjectMapper().writeValue(response.getOutputStream(), result);
+            } catch (MailSendException e) {
+                e.printStackTrace();
+                response.setContentType(APPLICATION_JSON_VALUE);
+                response.setStatus(502);
+                Map<String, String> errors = new HashMap<>();
+                errors.put("error", "Failed to send email message!");
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
+            }
+
+            // redirect to frontend with message that email verification letter was sent again
         }
     }
 }
