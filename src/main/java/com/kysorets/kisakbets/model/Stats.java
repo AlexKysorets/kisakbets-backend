@@ -3,6 +3,8 @@ package com.kysorets.kisakbets.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Document(collection = "Stats")
 public class Stats {
+    @Id
+    private ObjectId id;
     private String name;
     private String type;
     private LocalDateTime startedAt;
@@ -25,4 +29,22 @@ public class Stats {
     private double averageCoef;
     private int profit;
     private double profitPercent;
+
+    public Stats(String name, String type, LocalDateTime startedAt, LocalDateTime endedAt, int winCount, int loseCount,
+                 int refundCount, double winPercent, double minCoef, double maxCoef, double averageCoef, int profit,
+                 double profitPercent) {
+        this.name = name;
+        this.type = type;
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
+        this.winCount = winCount;
+        this.loseCount = loseCount;
+        this.refundCount = refundCount;
+        this.winPercent = winPercent;
+        this.minCoef = minCoef;
+        this.maxCoef = maxCoef;
+        this.averageCoef = averageCoef;
+        this.profit = profit;
+        this.profitPercent = profitPercent;
+    }
 }
