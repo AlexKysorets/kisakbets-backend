@@ -10,10 +10,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -71,12 +68,31 @@ public class AccountSettingsController {
             verificationCodeService.saveVerificationCode(code);
 
             emailSender.sendEmail(info.getNewEmail(), "KisakBets email changing", "To change your email " +
-                    "click this link ---> " + "http://localhost:8080/settings/email/change?code=" + code.getCode(), response);
+                    "click this link ---> " + "http://localhost:8080/settings/email/change?code=" + code.getCode() +
+                    "&email=" + info.getNewEmail(), response);
         } else {
             Map<String, String> errors = new HashMap<>();
             errors.put("error", "Incorrect password!");
             response.setContentType(APPLICATION_JSON_VALUE);
             new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
+    }
+
+    @GetMapping("/email/change")
+    public void changeEmail(@RequestParam("code") String code, @RequestParam("email") String newEmail) throws IOException {
+        VerificationCode verificationCode = verificationCodeService.getVerificationCodeByCode(code);
+        LocalDateTime date = LocalDateTime.now().minusHours(24);
+        if (verificationCode.getExpiresAt().isAfter(date)) {
+            User user = verificationCode.getUser();
+            user.setCode("");
+            user.setEmail(newEmail);
+            userService.saveUser(user);
+            verificationCodeService.deleteVerificationCodeByCode(code);
+            // redirect to frontend
+            Map<String, String> result = new HashMap<>();
+            result.put("message", "Successful email changing!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), result);
         }
     }
 }
