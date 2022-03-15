@@ -2,9 +2,13 @@ package com.kysorets.kisakbets.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.model.User;
+import com.kysorets.kisakbets.model.VerificationCode;
+import com.kysorets.kisakbets.security.EmailSender;
 import com.kysorets.kisakbets.service.user.UserService;
+import com.kysorets.kisakbets.service.verificationcode.VerificationCodeService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +30,8 @@ public class AccountSettingsController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final HttpServletResponse response;
+    private final EmailSender emailSender;
+    private final VerificationCodeService verificationCodeService;
 
     @PostMapping("/password")
     public void changePassword(@RequestBody ChangePassword info) throws IOException {
@@ -44,6 +51,34 @@ public class AccountSettingsController {
             new ObjectMapper().writeValue(response.getOutputStream(), errors);
         }
     }
+
+    @PostMapping("/email")
+    public void sendLetterToNewEmail(@RequestBody ChangeEmail info) throws IOException {
+        User user = userService.getUserByUsername(info.getUsername());
+        if (passwordEncoder.matches(info.getPassword(), user.getPassword())) {
+            String random = RandomString.make(50);
+            LocalDateTime date = LocalDateTime.now().plusHours(24);
+            VerificationCode code = new VerificationCode(random, date, user);
+
+            // delete previous code
+            VerificationCode previous = verificationCodeService.getVerificationCodeByUser(user);
+            if (previous != null) {
+                verificationCodeService.deleteVerificationCodeByCode(previous.getCode());
+            }
+
+            user.setCode(random);
+            userService.saveUser(user);
+            verificationCodeService.saveVerificationCode(code);
+
+            emailSender.sendEmail(info.getNewEmail(), "KisakBets email changing", "To change your email " +
+                    "click this link ---> " + "http://localhost:8080/settings/email/change?code=" + code.getCode(), response);
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "Incorrect password!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
+    }
 }
 
 @Data
@@ -51,4 +86,11 @@ class ChangePassword {
     private String username;
     private String currentPassword;
     private String newPassword;
+}
+
+@Data
+class ChangeEmail {
+    private String username;
+    private String password;
+    private String newEmail;
 }
