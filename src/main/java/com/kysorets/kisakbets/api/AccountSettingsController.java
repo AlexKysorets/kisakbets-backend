@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -95,6 +96,25 @@ public class AccountSettingsController {
             new ObjectMapper().writeValue(response.getOutputStream(), result);
         }
     }
+
+    @PostMapping("/username")
+    public void changeUsername(@RequestBody ChangeUsername info) throws IOException {
+        User user = userService.getUserByUsername(info.getCurrentUsername());
+        if (passwordEncoder.matches(info.getPassword(), user.getPassword())) {
+            user.setUsername(info.getNewUsername());
+            userService.saveUser(user);
+
+            Map<String, String> result = new HashMap<>();
+            result.put("message", "Username was changed successfully, please log in again!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), result);
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "Incorrect password!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
+    }
 }
 
 @Data
@@ -109,4 +129,11 @@ class ChangeEmail {
     private String username;
     private String password;
     private String newEmail;
+}
+
+@Data
+class ChangeUsername {
+    private String currentUsername;
+    private String password;
+    private String newUsername;
 }
