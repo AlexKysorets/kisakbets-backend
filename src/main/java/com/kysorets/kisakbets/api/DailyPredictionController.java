@@ -34,7 +34,7 @@ public class DailyPredictionController {
     private final HttpServletResponse response;
 
     @GetMapping("/single")
-    public void getDailyPrediction (@RequestBody DailyPredictionInfo info) throws IOException {
+    public void getDailySinglePrediction (@RequestBody DailyPredictionInfo info) throws IOException {
         User user = userService.getUserByUsername(info.getUsername());
         Subscription subscription = subscriptionService.getSubscriptionByUser(user);
         if (subscription != null) {
@@ -43,6 +43,32 @@ public class DailyPredictionController {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
                 String date = simpleDateFormat.format(new Date());
                 Prediction prediction = predictionService.getPredictionByTypeAndDate("single", date);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), prediction);
+            } else {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("error", "User don't have current subscription!");
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
+            }
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "User don't have any subscription!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
+    }
+
+    @GetMapping("/express")
+    public void getDailyExpressPrediction(@RequestBody DailyPredictionInfo info) throws IOException {
+        User user = userService.getUserByUsername(info.getUsername());
+        Subscription subscription = subscriptionService.getSubscriptionByUser(user);
+        if (subscription != null) {
+            if (subscription.getEndedAt().isAfter(LocalDateTime.now()) && subscription.getType().equals("express")) {
+                String pattern = "yyyy-MM-dd";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                String date = simpleDateFormat.format(new Date());
+                Prediction prediction = predictionService.getPredictionByTypeAndDate("express", date);
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), prediction);
             } else {
