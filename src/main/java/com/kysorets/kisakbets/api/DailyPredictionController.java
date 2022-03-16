@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -43,8 +44,15 @@ public class DailyPredictionController {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
                 String date = simpleDateFormat.format(new Date());
                 Prediction prediction = predictionService.getPredictionByTypeAndDate("single", date);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), prediction);
+                if (prediction != null) {
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getOutputStream(), prediction);
+                } else {
+                    Map<String, String> result = new HashMap<>();
+                    result.put("message", "Prediction isn't ready for now!");
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getOutputStream(), result);
+                }
             } else {
                 Map<String, String> errors = new HashMap<>();
                 errors.put("error", "User don't have current subscription!");
