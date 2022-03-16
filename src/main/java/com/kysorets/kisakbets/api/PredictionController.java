@@ -5,8 +5,11 @@ import com.kysorets.kisakbets.service.prediction.PredictionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -26,11 +29,9 @@ public class PredictionController {
 
     // READ BY TYPE OR DATE
     @GetMapping("/prediction/{field}")
-    public Prediction getPredictionByTypeOrDate(@PathVariable String field) {
+    public Prediction getPredictionByTypeOrDate(@PathVariable String field) throws ParseException {
         if (DATE_PATTERN.matcher(field).matches()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDateTime date = LocalDateTime.parse(field, formatter);
-            return predictionService.getPredictionByDate(date);
+            return predictionService.getPredictionByDate(field);
         } else
             return predictionService.getPredictionByType(field);
     }
@@ -43,7 +44,7 @@ public class PredictionController {
 
     // DELETE BY DATE
     @DeleteMapping("/prediction/{date}")
-    public void deletePredictionByDate(@PathVariable LocalDateTime date) {
+    public void deletePredictionByDate(@PathVariable String date) {
         predictionService.deletePredictionByDate(date);
     }
 }
