@@ -12,6 +12,7 @@ public interface SubscriptionService {
     Subscription getSubscriptionByType(String type);
     Subscription getSubscriptionByUser(User user);
     Subscription getSubscriptionByStartAndEndTime(LocalDateTime startedAt, LocalDateTime endedAt);
+    Subscription getSubscriptionByUserAndType(User user, String type);
     List<Subscription> getAllSubscriptions();
     void saveSubscription(Subscription subscription);
     void deleteSubscriptionByUser(User user);

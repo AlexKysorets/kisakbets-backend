@@ -37,9 +37,9 @@ public class DailyPredictionController {
     @GetMapping("/single")
     public void getDailySinglePrediction (@RequestBody DailyPredictionInfo info) throws IOException {
         User user = userService.getUserByUsername(info.getUsername());
-        Subscription subscription = subscriptionService.getSubscriptionByUser(user);
+        Subscription subscription = subscriptionService.getSubscriptionByUserAndType(user, "single");
         if (subscription != null) {
-            if (subscription.getEndedAt().isAfter(LocalDateTime.now()) && subscription.getType().equals("single")) {
+            if (subscription.getEndedAt().isAfter(LocalDateTime.now())) {
                 String pattern = "yyyy-MM-dd";
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
                 String date = simpleDateFormat.format(new Date());
@@ -70,9 +70,9 @@ public class DailyPredictionController {
     @GetMapping("/express")
     public void getDailyExpressPrediction(@RequestBody DailyPredictionInfo info) throws IOException {
         User user = userService.getUserByUsername(info.getUsername());
-        Subscription subscription = subscriptionService.getSubscriptionByUser(user);
+        Subscription subscription = subscriptionService.getSubscriptionByUserAndType(user, "express");
         if (subscription != null) {
-            if (subscription.getEndedAt().isAfter(LocalDateTime.now()) && subscription.getType().equals("express")) {
+            if (subscription.getEndedAt().isAfter(LocalDateTime.now())) {
                 String pattern = "yyyy-MM-dd";
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
                 String date = simpleDateFormat.format(new Date());
