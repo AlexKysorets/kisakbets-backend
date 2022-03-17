@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -19,8 +20,13 @@ public class PredictionServiceImplementation implements PredictionService{
     }
 
     @Override
-    public Prediction getPredictionByDate(LocalDateTime date) {
+    public Prediction getPredictionByDate(String date) {
         return predictionRepository.getByDate(date);
+    }
+
+    @Override
+    public Prediction getPredictionByTypeAndDate(String type, String date) {
+        return predictionRepository.getByTypeAndDate(type, date);
     }
 
     @Override
@@ -34,7 +40,7 @@ public class PredictionServiceImplementation implements PredictionService{
     }
 
     @Override
-    public void deletePredictionByDate(LocalDateTime date) {
+    public void deletePredictionByDate(String date) {
         predictionRepository.deleteByDate(date);
     }
 }

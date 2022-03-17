@@ -11,5 +11,6 @@ public interface SubscriptionRepository extends MongoRepository<Subscription, Ob
     Subscription getByType(String type);
     Subscription getByUser(User user);
     Subscription getByStartedAtAndEndedAt(LocalDateTime startedAt, LocalDateTime endedAt);
+    Subscription getByUserAndType(User user, String type);
     void deleteByUser(User user);
 }

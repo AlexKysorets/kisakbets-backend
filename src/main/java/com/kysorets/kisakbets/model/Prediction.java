@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -17,10 +18,10 @@ public class Prediction {
     @Id
     private ObjectId id;
     private String type;
-    private LocalDateTime date;
+    private String date;
     private String description;
 
-    public Prediction(String type, LocalDateTime date, String description) {
+    public Prediction(String type, String date, String description) {
         this.type = type;
         this.date = date;
         this.description = description;

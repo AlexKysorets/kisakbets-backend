@@ -30,6 +30,11 @@ public class SubscriptionServiceImplementation implements SubscriptionService{
     }
 
     @Override
+    public Subscription getSubscriptionByUserAndType(User user, String type) {
+        return subscriptionRepository.getByUserAndType(user, type);
+    }
+
+    @Override
     public List<Subscription> getAllSubscriptions() {
         return subscriptionRepository.findAll();
     }
