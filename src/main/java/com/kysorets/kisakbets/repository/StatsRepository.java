@@ -10,5 +10,6 @@ public interface StatsRepository extends MongoRepository<Stats, ObjectId> {
     Stats getByName(String name);
     Stats getByType(String type);
     Stats getByStartedAtAndEndedAt(LocalDateTime startedAt, LocalDateTime endedAt);
+    Stats getByNameAndType(String name, String type);
     void deleteByName(String name);
 }
