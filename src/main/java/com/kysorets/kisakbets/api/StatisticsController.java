@@ -57,4 +57,15 @@ public class StatisticsController {
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), stats);
     }
+
+    @GetMapping("/overall")
+    public void getOverallStats() throws IOException {
+        Stats statsSingle = statsService.getStatsByNameAndType("Overall", "single");
+        Stats statsExpress = statsService.getStatsByNameAndType("Overall", "express");
+        List<Stats> stats = new ArrayList<>();
+        stats.add(statsSingle);
+        stats.add(statsExpress);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), stats);
+    }
 }
