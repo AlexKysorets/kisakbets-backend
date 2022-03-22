@@ -6,8 +6,10 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -29,10 +31,12 @@ public class Stats {
     private double averageCoef;
     private int profit;
     private double profitPercent;
+    @DocumentReference
+    private List<Prediction> predictions;
 
     public Stats(String name, String type, LocalDateTime startedAt, LocalDateTime endedAt, int winCount, int loseCount,
                  int refundCount, double winPercent, double minCoef, double maxCoef, double averageCoef, int profit,
-                 double profitPercent) {
+                 double profitPercent, List<Prediction> predictions) {
         this.name = name;
         this.type = type;
         this.startedAt = startedAt;
@@ -46,5 +50,6 @@ public class Stats {
         this.averageCoef = averageCoef;
         this.profit = profit;
         this.profitPercent = profitPercent;
+        this.predictions = predictions;
     }
 }

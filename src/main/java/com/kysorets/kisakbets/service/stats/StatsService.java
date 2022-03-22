@@ -11,6 +11,7 @@ public interface StatsService {
     Stats getStatsByName(String name);
     Stats getStatsByType(String type);
     Stats getStatsByStartedAndEndedTime(LocalDateTime startedAt, LocalDateTime endedAt);
+    Stats getStatsByNameAndType(String name, String type);
     List<Stats> getAllStats();
     void saveStats(Stats stats);
     void deleteStatsByName(String name);

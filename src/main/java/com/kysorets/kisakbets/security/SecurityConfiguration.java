@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         // PATHS FOR EVERYBODY
         http.authorizeRequests().antMatchers( "/login", "/token/refresh", "/signup", "/email/verify", "/forgot-pass/*",
-                "/forgot-username/send", "/settings/email/change").permitAll();
+                "/forgot-username/send", "/settings/email/change", "/stats/*").permitAll();
         // PATHS FOR ADMINS
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/**")
                 .hasAnyAuthority("ROLE_ADMIN");

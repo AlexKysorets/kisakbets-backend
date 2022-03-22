@@ -29,6 +29,11 @@ public class StatsServiceImplementation implements StatsService{
     }
 
     @Override
+    public Stats getStatsByNameAndType(String name, String type) {
+        return statsRepository.getByNameAndType(name, type);
+    }
+
+    @Override
     public List<Stats> getAllStats() {
         return statsRepository.findAll();
     }
