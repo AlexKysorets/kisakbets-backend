@@ -31,7 +31,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 request.getServletPath().equals("/signup") || request.getServletPath().equals("/email/verify") ||
                 request.getServletPath().equals("/forgot-pass/*") || request.getServletPath().equals("/forgot-username/send") ||
                 request.getServletPath().equals("/settings/email/change") || request.getServletPath().equals("/stats/*") ||
-                request.getServletPath().equals("/contact-us-message/send")) {
+                request.getServletPath().equals("/contact-us-message/save")) {
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);

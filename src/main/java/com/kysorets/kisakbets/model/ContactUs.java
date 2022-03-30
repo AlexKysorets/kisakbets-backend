@@ -19,12 +19,14 @@ public class ContactUs {
     private String subject;
     private String message;
     private boolean isRegistered;
+    private boolean isAnswered;
 
-    public ContactUs(String name, String email, String subject, String message, boolean isRegistered) {
+    public ContactUs(String name, String email, String subject, String message, boolean isRegistered, boolean isAnswered) {
         this.name = name;
         this.email = email;
         this.subject = subject;
         this.message = message;
         this.isRegistered = isRegistered;
+        this.isAnswered = isAnswered;
     }
 }
