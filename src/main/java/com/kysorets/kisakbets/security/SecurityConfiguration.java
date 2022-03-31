@@ -46,6 +46,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/contact-us-message/send")
                 .hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/news/*")
+                .hasAnyAuthority("ROLE_ADMIN");
         // PATH FOR USERS
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/email/send")
                 .hasAnyAuthority("ROLE_USER");
