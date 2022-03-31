@@ -2,7 +2,10 @@ package com.kysorets.kisakbets.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kysorets.kisakbets.model.News;
+import com.kysorets.kisakbets.model.NewsEmail;
+import com.kysorets.kisakbets.security.EmailSender;
 import com.kysorets.kisakbets.service.news.NewsService;
+import com.kysorets.kisakbets.service.newsemail.NewsEmailService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -24,6 +28,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class NewsletterController {
     private final NewsService newsService;
     private final HttpServletResponse response;
+    private final EmailSender emailSender;
+    private final NewsEmailService newsEmailService;
 
     @PostMapping("/create")
     public void createNews(@RequestBody CreateNewsInfo info) throws IOException {
@@ -35,10 +41,40 @@ public class NewsletterController {
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), result);
     }
+
+    @PostMapping("/send")
+    public void sendNewsLetter(@RequestBody News news) throws IOException {
+        List<NewsEmail> emails = newsEmailService.getNewsEmails();
+        for (NewsEmail email:
+             emails) {
+            emailSender.sendEmail(email.getEmail(), "KisakBets " + news.getName(), news.getContent(), response);
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "successful sending!");
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), result);
+    }
+
+    @PostMapping("/subscribe")
+    public void subscribeToNewsLetter(@RequestBody SubscribeInfo info) throws IOException {
+        NewsEmail newsEmail = new NewsEmail(info.getEmail());
+        newsEmailService.saveNewsEmail(newsEmail);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "successful subscribing!");
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), result);
+    }
 }
 
 @Data
 class CreateNewsInfo {
     private String name;
     private String content;
+}
+
+@Data
+class SubscribeInfo {
+    private String email;
 }
