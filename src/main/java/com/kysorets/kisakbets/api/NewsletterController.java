@@ -49,22 +49,25 @@ public class NewsletterController {
              emails) {
             emailSender.sendEmail(email.getEmail(), "KisakBets " + news.getName(), news.getContent(), response);
         }
-
-        Map<String, String> result = new HashMap<>();
-        result.put("message", "successful sending!");
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), result);
     }
 
     @PostMapping("/subscribe")
     public void subscribeToNewsLetter(@RequestBody SubscribeInfo info) throws IOException {
-        NewsEmail newsEmail = new NewsEmail(info.getEmail());
-        newsEmailService.saveNewsEmail(newsEmail);
+        NewsEmail check = newsEmailService.getNewsEmailByEmail(info.getEmail());
+        if (check == null) {
+            NewsEmail newsEmail = new NewsEmail(info.getEmail());
+            newsEmailService.saveNewsEmail(newsEmail);
 
-        Map<String, String> result = new HashMap<>();
-        result.put("message", "successful subscribing!");
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), result);
+            Map<String, String> result = new HashMap<>();
+            result.put("message", "successful subscribing!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), result);
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", "you already subscribed to newsletter!");
+            response.setContentType(APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
     }
 }
 
