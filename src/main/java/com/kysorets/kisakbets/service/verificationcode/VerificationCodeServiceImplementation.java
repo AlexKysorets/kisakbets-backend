@@ -4,6 +4,8 @@ import com.kysorets.kisakbets.model.User;
 import com.kysorets.kisakbets.model.VerificationCode;
 import com.kysorets.kisakbets.repository.VerificationCodeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,8 +32,10 @@ public class VerificationCodeServiceImplementation implements VerificationCodeSe
     }
 
     @Override
-    public List<VerificationCode> getVerificationCodes() {
-        return verificationCodeRepository.findAll();
+    public List<VerificationCode> getVerificationCodes(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var verificationCodes = verificationCodeRepository.findAll(pageable);
+        return verificationCodes.toList();
     }
 
     @Override
