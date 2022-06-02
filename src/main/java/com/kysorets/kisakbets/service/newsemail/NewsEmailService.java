@@ -9,6 +9,7 @@ import java.util.List;
 public interface NewsEmailService {
     NewsEmail getNewsEmailByEmail(String email);
     List<NewsEmail> getNewsEmails(int page, int size);
+    List<NewsEmail> getNewsEmailsForOnce();
     void saveNewsEmail(NewsEmail newsEmail);
     void deleteNewsEmailByEmail(String email);
 }

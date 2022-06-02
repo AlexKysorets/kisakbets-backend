@@ -27,6 +27,11 @@ public class NewsEmailServiceImplementation implements NewsEmailService{
     }
 
     @Override
+    public List<NewsEmail> getNewsEmailsForOnce() {
+        return newsEmailRepository.findAll();
+    }
+
+    @Override
     public void saveNewsEmail(NewsEmail newsEmail) {
         newsEmailRepository.save(newsEmail);
     }

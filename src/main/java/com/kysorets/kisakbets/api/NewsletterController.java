@@ -44,7 +44,7 @@ public class NewsletterController {
 
     @PostMapping("/send")
     public void sendNewsLetter(@RequestBody News news) throws IOException {
-        List<NewsEmail> emails = newsEmailService.getNewsEmails();
+        List<NewsEmail> emails = newsEmailService.getNewsEmailsForOnce();
         for (NewsEmail email:
              emails) {
             emailSender.sendEmail(email.getEmail(), "KisakBets " + news.getName(), news.getContent(), response);
