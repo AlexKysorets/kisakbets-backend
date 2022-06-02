@@ -9,11 +9,11 @@ import java.util.List;
 
 @Service
 public interface SubscriptionService {
-    Subscription getSubscriptionByType(String type);
-    Subscription getSubscriptionByUser(User user);
-    Subscription getSubscriptionByStartAndEndTime(LocalDateTime startedAt, LocalDateTime endedAt);
+    List<Subscription> getSubscriptionByType(String type);
+    List<Subscription> getSubscriptionByUser(User user);
+    List<Subscription> getSubscriptionByStartAndEndTime(LocalDateTime startedAt, LocalDateTime endedAt);
     Subscription getSubscriptionByUserAndType(User user, String type);
-    List<Subscription> getAllSubscriptions();
+    List<Subscription> getAllSubscriptions(int page, int size);
     void saveSubscription(Subscription subscription);
     void deleteSubscriptionByUser(User user);
 }

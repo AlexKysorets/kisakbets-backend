@@ -4,6 +4,8 @@ import com.kysorets.kisakbets.model.Subscription;
 import com.kysorets.kisakbets.model.User;
 import com.kysorets.kisakbets.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,17 +17,17 @@ public class SubscriptionServiceImplementation implements SubscriptionService{
     private final SubscriptionRepository subscriptionRepository;
 
     @Override
-    public Subscription getSubscriptionByType(String type) {
+    public List<Subscription> getSubscriptionByType(String type) {
         return subscriptionRepository.getByType(type);
     }
 
     @Override
-    public Subscription getSubscriptionByUser(User user) {
+    public List<Subscription> getSubscriptionByUser(User user) {
         return subscriptionRepository.getByUser(user);
     }
 
     @Override
-    public Subscription getSubscriptionByStartAndEndTime(LocalDateTime startedAt, LocalDateTime endedAt) {
+    public List<Subscription> getSubscriptionByStartAndEndTime(LocalDateTime startedAt, LocalDateTime endedAt) {
         return subscriptionRepository.getByStartedAtAndEndedAt(startedAt, endedAt);
     }
 
@@ -35,8 +37,10 @@ public class SubscriptionServiceImplementation implements SubscriptionService{
     }
 
     @Override
-    public List<Subscription> getAllSubscriptions() {
-        return subscriptionRepository.findAll();
+    public List<Subscription> getAllSubscriptions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var subscriptions = subscriptionRepository.findAll(pageable);
+        return subscriptions.toList();
     }
 
     @Override
