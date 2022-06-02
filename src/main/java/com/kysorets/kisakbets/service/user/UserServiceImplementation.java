@@ -5,6 +5,8 @@ import com.kysorets.kisakbets.model.User;
 import com.kysorets.kisakbets.repository.RoleRepository;
 import com.kysorets.kisakbets.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,8 +34,10 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<User> getUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var users = userRepository.findAll(pageable);
+        return users.toList();
     }
 
     @Override
