@@ -3,6 +3,8 @@ package com.kysorets.kisakbets.service.prediction;
 import com.kysorets.kisakbets.model.Prediction;
 import com.kysorets.kisakbets.repository.PredictionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,12 +17,12 @@ public class PredictionServiceImplementation implements PredictionService{
     private final PredictionRepository predictionRepository;
 
     @Override
-    public Prediction getPredictionByType(String type) {
+    public List<Prediction> getPredictionByType(String type) {
         return predictionRepository.getByType(type);
     }
 
     @Override
-    public Prediction getPredictionByDate(String date) {
+    public List<Prediction> getPredictionByDate(String date) {
         return predictionRepository.getByDate(date);
     }
 
@@ -30,8 +32,10 @@ public class PredictionServiceImplementation implements PredictionService{
     }
 
     @Override
-    public List<Prediction> getAllPredictions() {
-        return predictionRepository.findAll();
+    public List<Prediction> getAllPredictions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var predictions = predictionRepository.findAll(pageable);
+        return predictions.toList();
     }
 
     @Override
