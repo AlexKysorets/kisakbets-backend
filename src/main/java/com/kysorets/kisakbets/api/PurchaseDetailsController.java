@@ -4,6 +4,7 @@ import com.kysorets.kisakbets.model.PurchaseDetails;
 import com.kysorets.kisakbets.model.Subscription;
 import com.kysorets.kisakbets.service.purchasedetails.PurchaseDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,28 +15,35 @@ import java.util.List;
 public class PurchaseDetailsController {
     private final PurchaseDetailsService purchaseDetailsService;
 
-    // CREATE AND UPDATE
+    // CREATE
     @PostMapping("/purchase-detail")
-    public void createOrUpdatePurchaseDetails(@RequestBody PurchaseDetails purchaseDetails) {
+    public void createPurchaseDetails(@RequestBody PurchaseDetails purchaseDetails) {
+        purchaseDetailsService.savePurchaseDetails(purchaseDetails);
+    }
+
+    // UPDATE
+    @PutMapping("/purchase-detail")
+    public void updatePurchaseDetail(@RequestBody PurchaseDetails purchaseDetails) {
         purchaseDetailsService.savePurchaseDetails(purchaseDetails);
     }
 
     // READ BY STATUS
     @GetMapping("/purchase-detail/{status}")
-    public PurchaseDetails getPurchaseDetailsByStatus(@PathVariable String status) {
-        return purchaseDetailsService.getPurchaseDetailsByStatus(status);
+    public ResponseEntity<List<PurchaseDetails>> getPurchaseDetailsByStatus(@PathVariable String status) {
+        return ResponseEntity.ok(purchaseDetailsService.getPurchaseDetailsByStatus(status));
     }
 
     // READ BY SUBSCRIPTION
     @GetMapping("/purchase-detail")
-    public PurchaseDetails getPurchaseDetailsBySubscription(@RequestBody Subscription subscription) {
-        return purchaseDetailsService.getPurchaseDetailsBySubscription(subscription);
+    public ResponseEntity<PurchaseDetails> getPurchaseDetailsBySubscription(@RequestBody Subscription subscription) {
+        return ResponseEntity.ok(purchaseDetailsService.getPurchaseDetailsBySubscription(subscription));
     }
 
     // READ ALL
     @GetMapping("/purchase-details")
-    public List<PurchaseDetails> getAllPurchaseDetails() {
-        return purchaseDetailsService.getPurchaseDetails();
+    public ResponseEntity<List<PurchaseDetails>> getAllPurchaseDetails(@RequestParam(required = false, defaultValue = "0") int page,
+                                                                       @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(purchaseDetailsService.getPurchaseDetails(page, size));
     }
 
     // DELETE

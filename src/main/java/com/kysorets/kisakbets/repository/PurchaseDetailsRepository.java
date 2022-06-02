@@ -5,8 +5,10 @@ import com.kysorets.kisakbets.model.Subscription;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
+
 public interface PurchaseDetailsRepository extends MongoRepository<PurchaseDetails, ObjectId> {
-    PurchaseDetails getByStatus(String status);
+    List<PurchaseDetails> getByStatus(String status);
     PurchaseDetails getBySubscription(Subscription subscription);
     void deleteBySubscription(Subscription subscription);
 }
