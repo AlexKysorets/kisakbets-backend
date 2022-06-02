@@ -3,6 +3,7 @@ package com.kysorets.kisakbets.api;
 import com.kysorets.kisakbets.model.Stats;
 import com.kysorets.kisakbets.service.stats.StatsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -14,28 +15,36 @@ import java.util.List;
 public class StatsController {
     private final StatsService statsService;
 
-    // CREATE AND UPDATE
+    // CREATE
     @PostMapping("/stat")
-    public void createOrUpdateStats(@RequestBody Stats stats) {
+    public void createStats(@RequestBody Stats stats) {
+        statsService.saveStats(stats);
+    }
+
+    // UPDATE
+    @PutMapping("/stat")
+    public void updateStats(@RequestBody Stats stats) {
         statsService.saveStats(stats);
     }
 
     // READ BY TYPE
     @GetMapping("/stat/{type}")
-    public Stats getStatsByType(@PathVariable String type) {
-        return statsService.getStatsByType(type);
+    public ResponseEntity<List<Stats>> getStatsByType(@PathVariable String type) {
+        return ResponseEntity.ok(statsService.getStatsByType(type));
     }
 
     // READ BY STARTED AND ENDED TIME
     @GetMapping("/stat/{startedAt}-{endedAt}")
-    public Stats getStatsByStartedAndEndedTime(@PathVariable LocalDateTime startedAt, @PathVariable LocalDateTime endedAt) {
-        return statsService.getStatsByStartedAndEndedTime(startedAt, endedAt);
+    public ResponseEntity<List<Stats>> getStatsByStartedAndEndedTime(@PathVariable LocalDateTime startedAt,
+                                                                     @PathVariable LocalDateTime endedAt) {
+        return ResponseEntity.ok(statsService.getStatsByStartedAndEndedTime(startedAt, endedAt));
     }
 
     // READ ALL
     @GetMapping("/stats")
-    public List<Stats> getAllStats() {
-        return statsService.getAllStats();
+    public ResponseEntity<List<Stats>> getAllStats(@RequestParam(required = false, defaultValue = "0") int page,
+                                                   @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(statsService.getAllStats(page, size));
     }
 
     // DELETE BY NAME

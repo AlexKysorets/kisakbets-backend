@@ -3,6 +3,8 @@ package com.kysorets.kisakbets.service.stats;
 import com.kysorets.kisakbets.model.Stats;
 import com.kysorets.kisakbets.repository.StatsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,17 +16,17 @@ public class StatsServiceImplementation implements StatsService{
     private final StatsRepository statsRepository;
 
     @Override
-    public Stats getStatsByName(String name) {
+    public List<Stats> getStatsByName(String name) {
         return statsRepository.getByName(name);
     }
 
     @Override
-    public Stats getStatsByType(String type) {
+    public List<Stats> getStatsByType(String type) {
         return statsRepository.getByType(type);
     }
 
     @Override
-    public Stats getStatsByStartedAndEndedTime(LocalDateTime startedAt, LocalDateTime endedAt) {
+    public List<Stats> getStatsByStartedAndEndedTime(LocalDateTime startedAt, LocalDateTime endedAt) {
         return statsRepository.getByStartedAtAndEndedAt(startedAt, endedAt);
     }
 
@@ -34,8 +36,10 @@ public class StatsServiceImplementation implements StatsService{
     }
 
     @Override
-    public List<Stats> getAllStats() {
-        return statsRepository.findAll();
+    public List<Stats> getAllStats(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var stats = statsRepository.findAll(pageable);
+        return stats.toList();
     }
 
     @Override

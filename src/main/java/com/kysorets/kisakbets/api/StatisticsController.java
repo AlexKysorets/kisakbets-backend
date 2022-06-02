@@ -68,18 +68,4 @@ public class StatisticsController {
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), stats);
     }
-
-    @GetMapping("/all-months")
-    public void getStatsForAllMonths() throws IOException {
-        List<Stats> parseStats = statsService.getAllStats();
-        List<Stats> allMonths = new ArrayList<>();
-        for (Stats stat:
-             parseStats) {
-            if (!stat.getName().equals("Overall")) {
-                allMonths.add(stat);
-            }
-        }
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), allMonths);
-    }
 }

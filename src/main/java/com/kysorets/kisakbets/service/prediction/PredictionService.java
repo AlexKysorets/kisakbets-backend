@@ -9,10 +9,10 @@ import java.util.List;
 
 @Service
 public interface PredictionService {
-    Prediction getPredictionByType(String type);
-    Prediction getPredictionByDate(String date);
+    List<Prediction> getPredictionByType(String type);
+    List<Prediction> getPredictionByDate(String date);
     Prediction getPredictionByTypeAndDate(String type, String date);
-    List<Prediction> getAllPredictions();
+    List<Prediction> getAllPredictions(int page, int size);
     void savePrediction(Prediction prediction);
     void deletePredictionByDate(String date);
 }

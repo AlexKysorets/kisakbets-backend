@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public interface NewsEmailService {
     NewsEmail getNewsEmailByEmail(String email);
-    List<NewsEmail> getNewsEmails();
+    List<NewsEmail> getNewsEmails(int page, int size);
     void saveNewsEmail(NewsEmail newsEmail);
     void deleteNewsEmailByEmail(String email);
 }

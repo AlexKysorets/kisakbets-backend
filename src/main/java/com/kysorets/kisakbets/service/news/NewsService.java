@@ -10,7 +10,7 @@ import java.util.List;
 public interface NewsService {
     News getNewsByName(String name);
     News getNewsByDate(LocalDateTime date);
-    List<News> getNews();
+    List<News> getNews(int page, int size);
     void saveNews(News news);
     void deleteNewsByName(String name);
     void deleteNewsByDate(LocalDateTime date);

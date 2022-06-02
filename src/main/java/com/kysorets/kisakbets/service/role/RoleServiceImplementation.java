@@ -3,6 +3,8 @@ package com.kysorets.kisakbets.service.role;
 import com.kysorets.kisakbets.model.Role;
 import com.kysorets.kisakbets.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

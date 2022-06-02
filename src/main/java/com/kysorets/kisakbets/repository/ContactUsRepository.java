@@ -4,8 +4,10 @@ import com.kysorets.kisakbets.model.ContactUs;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
+
 public interface ContactUsRepository extends MongoRepository<ContactUs, ObjectId> {
-    ContactUs getByEmail(String email);
-    ContactUs getBySubject(String subject);
+    List<ContactUs> getByEmail(String email);
+    List<ContactUs> getBySubject(String subject);
     void deleteByEmail(String email);
 }

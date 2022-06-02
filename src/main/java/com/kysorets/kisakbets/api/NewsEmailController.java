@@ -3,6 +3,7 @@ package com.kysorets.kisakbets.api;
 import com.kysorets.kisakbets.model.NewsEmail;
 import com.kysorets.kisakbets.service.newsemail.NewsEmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,22 +14,29 @@ import java.util.List;
 public class NewsEmailController {
     private final NewsEmailService newsEmailService;
 
-    // CREATE OR UPDATE
+    // CREATE
     @PostMapping("/news-email")
-    public void createOrUpdateNewsEmail(@RequestBody NewsEmail newsEmail) {
+    public void createNewsEmail(@RequestBody NewsEmail newsEmail) {
+        newsEmailService.saveNewsEmail(newsEmail);
+    }
+
+    // UPDATE
+    @PutMapping("/news-email")
+    public void updateNewsEmail(@RequestBody NewsEmail newsEmail) {
         newsEmailService.saveNewsEmail(newsEmail);
     }
 
     // READ
     @GetMapping("/news-email/{email}")
-    public NewsEmail getNewsEmailByEmail(@PathVariable String email) {
-        return newsEmailService.getNewsEmailByEmail(email);
+    public ResponseEntity<NewsEmail> getNewsEmailByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(newsEmailService.getNewsEmailByEmail(email));
     }
 
     // READ ALL
     @GetMapping("/news-emails")
-    public List<NewsEmail> getAllNewsEmails() {
-        return newsEmailService.getNewsEmails();
+    public ResponseEntity<List<NewsEmail>> getAllNewsEmails(@RequestParam(required = false, defaultValue = "0") int page,
+                                                            @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(newsEmailService.getNewsEmails(page, size));
     }
 
     // DELETE

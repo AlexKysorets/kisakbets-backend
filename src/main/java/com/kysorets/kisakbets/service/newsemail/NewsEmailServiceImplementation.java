@@ -3,6 +3,8 @@ package com.kysorets.kisakbets.service.newsemail;
 import com.kysorets.kisakbets.model.NewsEmail;
 import com.kysorets.kisakbets.repository.NewsEmailRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +20,10 @@ public class NewsEmailServiceImplementation implements NewsEmailService{
     }
 
     @Override
-    public List<NewsEmail> getNewsEmails() {
-        return newsEmailRepository.findAll();
+    public List<NewsEmail> getNewsEmails(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var newsEmails = newsEmailRepository.findAll(pageable);
+        return newsEmails.toList();
     }
 
     @Override

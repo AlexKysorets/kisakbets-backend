@@ -12,7 +12,7 @@ public interface PasswordCodeService {
     PasswordCode getPasswordCodeByCode(String code);
     PasswordCode getPasswordCodeByExpiresAt(LocalDateTime date);
     PasswordCode getPasswordCodeByUser(User user);
-    List<PasswordCode> getPasswordCodes();
+    List<PasswordCode> getPasswordCodes(int page, int size);
     void savePasswordCode(PasswordCode passwordCode);
     void deletePasswordCodeByUser(User user);
     void deletePasswordCodeByCode(String code);

@@ -8,11 +8,11 @@ import java.util.List;
 
 @Service
 public interface StatsService {
-    Stats getStatsByName(String name);
-    Stats getStatsByType(String type);
-    Stats getStatsByStartedAndEndedTime(LocalDateTime startedAt, LocalDateTime endedAt);
+    List<Stats> getStatsByName(String name);
+    List<Stats> getStatsByType(String type);
+    List<Stats> getStatsByStartedAndEndedTime(LocalDateTime startedAt, LocalDateTime endedAt);
     Stats getStatsByNameAndType(String name, String type);
-    List<Stats> getAllStats();
+    List<Stats> getAllStats(int page, int size);
     void saveStats(Stats stats);
     void deleteStatsByName(String name);
 }

@@ -13,9 +13,15 @@ import java.util.List;
 public class RoleController {
     private final RoleService roleService;
 
-    // CREATE AND UPDATE
+    // CREATE
     @PostMapping("/role")
-    public void createOrUpdateRole(@RequestBody Role role) {
+    public void createRole(@RequestBody Role role) {
+        roleService.saveRole(role);
+    }
+
+    // UPDATE
+    @PutMapping("/role")
+    public void updateRole(@RequestBody Role role) {
         roleService.saveRole(role);
     }
 

@@ -3,6 +3,8 @@ package com.kysorets.kisakbets.service.news;
 import com.kysorets.kisakbets.model.News;
 import com.kysorets.kisakbets.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,8 +26,10 @@ public class NewsServiceImplementation implements NewsService{
     }
 
     @Override
-    public List<News> getNews() {
-        return newsRepository.findAll();
+    public List<News> getNews(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var news = newsRepository.findAll(pageable);
+        return news.toList();
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface VerificationCodeService {
     VerificationCode getVerificationCodeByCode(String code);
     VerificationCode getVerificationCodeByExpiresAt(LocalDateTime localDateTime);
     VerificationCode getVerificationCodeByUser(User user);
-    List<VerificationCode> getVerificationCodes();
+    List<VerificationCode> getVerificationCodes(int page, int size);
     void saveVerificationCode(VerificationCode verificationCode);
     void deleteVerificationCodeByCode(String code);
     void deleteVerificationCodeByUser(User user);

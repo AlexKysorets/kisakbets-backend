@@ -3,6 +3,7 @@ package com.kysorets.kisakbets.api;
 import com.kysorets.kisakbets.model.Prediction;
 import com.kysorets.kisakbets.service.prediction.PredictionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -21,25 +22,32 @@ public class PredictionController {
     private final static Pattern DATE_PATTERN = Pattern.compile(
             "^\\d{4}-\\d{2}-\\d{2}$");
 
-    // CREATE AND UPDATE
+    // CREATE
     @PostMapping("/prediction")
-    public void createOrUpdatePrediction(@RequestBody Prediction prediction) {
+    public void createPrediction(@RequestBody Prediction prediction) {
+        predictionService.savePrediction(prediction);
+    }
+
+    // UPDATE
+    @PutMapping("/prediction")
+    public void updatePrediction(@RequestBody Prediction prediction) {
         predictionService.savePrediction(prediction);
     }
 
     // READ BY TYPE OR DATE
     @GetMapping("/prediction/{field}")
-    public Prediction getPredictionByTypeOrDate(@PathVariable String field) throws ParseException {
+    public ResponseEntity<List<Prediction>> getPredictionByTypeOrDate(@PathVariable String field) throws ParseException {
         if (DATE_PATTERN.matcher(field).matches()) {
-            return predictionService.getPredictionByDate(field);
+            return ResponseEntity.ok(predictionService.getPredictionByDate(field));
         } else
-            return predictionService.getPredictionByType(field);
+            return ResponseEntity.ok(predictionService.getPredictionByType(field));
     }
 
     // READ ALL
     @GetMapping("/predictions")
-    public List<Prediction> getAllPredictions() {
-        return predictionService.getAllPredictions();
+    public ResponseEntity<List<Prediction>> getAllPredictions(@RequestParam(required = false, defaultValue = "0") int page,
+                                                              @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(predictionService.getAllPredictions(page, size));
     }
 
     // DELETE BY DATE

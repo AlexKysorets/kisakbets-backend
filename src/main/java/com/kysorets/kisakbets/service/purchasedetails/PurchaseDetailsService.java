@@ -8,9 +8,9 @@ import java.util.List;
 
 @Service
 public interface PurchaseDetailsService {
-    PurchaseDetails getPurchaseDetailsByStatus(String status);
+    List<PurchaseDetails> getPurchaseDetailsByStatus(String status);
     PurchaseDetails getPurchaseDetailsBySubscription(Subscription subscription);
-    List<PurchaseDetails> getPurchaseDetails();
+    List<PurchaseDetails> getPurchaseDetails(int page, int size);
     void deletePurchaseDetails(Subscription subscription);
     void savePurchaseDetails(PurchaseDetails purchaseDetails);
 }

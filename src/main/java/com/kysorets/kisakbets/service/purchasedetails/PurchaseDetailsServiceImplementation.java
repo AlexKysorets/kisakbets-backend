@@ -4,6 +4,8 @@ import com.kysorets.kisakbets.model.PurchaseDetails;
 import com.kysorets.kisakbets.model.Subscription;
 import com.kysorets.kisakbets.repository.PurchaseDetailsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +16,7 @@ public class PurchaseDetailsServiceImplementation implements PurchaseDetailsServ
     private final PurchaseDetailsRepository purchaseDetailsRepository;
 
     @Override
-    public PurchaseDetails getPurchaseDetailsByStatus(String status) {
+    public List<PurchaseDetails> getPurchaseDetailsByStatus(String status) {
         return purchaseDetailsRepository.getByStatus(status);
     }
 
@@ -24,8 +26,10 @@ public class PurchaseDetailsServiceImplementation implements PurchaseDetailsServ
     }
 
     @Override
-    public List<PurchaseDetails> getPurchaseDetails() {
-        return purchaseDetailsRepository.findAll();
+    public List<PurchaseDetails> getPurchaseDetails(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        var purchaseDetails = purchaseDetailsRepository.findAll(pageable);
+        return purchaseDetails.toList();
     }
 
     @Override
