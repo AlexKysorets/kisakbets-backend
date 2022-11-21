@@ -44,6 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**")
                 .hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**")
+                        .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/contact-us-message/send")
                 .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/news/create", "/news/send")
@@ -59,6 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), userService));
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.cors();
     }
 
 
